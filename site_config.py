@@ -15,7 +15,7 @@ DOCS = 'https://gachon-cclab.github.io/fedops-docs-1.3/'
 HOME = 'https://gachon-cclab.github.io/fedops-homepage/'
 BLOG = HOME + 'blog/'
 NEWS = HOME + 'news/'
-CONSOLE = os.environ.get('FEDOPS_CONSOLE_URL', 'https://ccl.gachon.ac.kr/fedops')
+CONSOLE = os.environ.get('FEDOPS_CONSOLE_URL', 'https://ccl.gachon.ac.kr/fedops' if PUBLIC else 'http://127.0.0.1:4314/fedops/task')
 REGISTRY = os.environ.get('FEDOPS_REGISTRY_URL', 'https://ccl.gachon.ac.kr/fedops/registry')
 for setting in (CONSOLE, REGISTRY):
     parsed = urlsplit(setting)

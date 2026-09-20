@@ -62,10 +62,10 @@ sample: false
 | `FEDOPS_ENV` | `local` | `production` |
 | `FEDOPS_BASE_PATH` | 빈 문자열 | `/fedops-homepage` |
 | `FEDOPS_OUTPUT_DIR` | `dist` | `_site` |
-| `FEDOPS_CONSOLE_URL` | `https://ccl.gachon.ac.kr/fedops` | `https://ccl.gachon.ac.kr/fedops` |
+| `FEDOPS_CONSOLE_URL` | `http://127.0.0.1:4314/fedops/task` | `https://ccl.gachon.ac.kr/fedops` |
 | `FEDOPS_REGISTRY_URL` | `https://ccl.gachon.ac.kr/fedops/registry` | `https://ccl.gachon.ac.kr/fedops/registry` |
 
-설정은 `site_config.py`에서 한 번에 관리합니다. 로컬 미리보기의 상단 메뉴·푸터도 Home / Docs / Blog / News / Console의 공개 주소를 사용합니다. 공개 빌드는 localhost 서비스 주소를 거부하고 저장소 경로를 HTML/이미지 링크에 적용합니다. CSS 이미지는 상대 경로를 사용합니다. GitHub repository variables로 `FEDOPS_CONSOLE_URL`, `FEDOPS_REGISTRY_URL`을 지정하면 Console pod의 공개 주소 변경에 대응할 수 있습니다.
+설정은 `site_config.py`에서 한 번에 관리합니다. 로컬 미리보기의 Home / Docs / Blog / News는 공개 주소를 사용하고 Open Console만 로컬 `4314/fedops/task`를 엽니다. 공개 빌드의 Open Console은 별도 서비스의 공개 주소를 사용합니다. 공개 빌드는 localhost 서비스 주소를 거부하고 저장소 경로를 HTML/이미지 링크에 적용합니다. CSS 이미지는 상대 경로를 사용합니다. GitHub repository variables로 `FEDOPS_CONSOLE_URL`, `FEDOPS_REGISTRY_URL`을 지정하면 Console pod의 공개 주소 변경에 대응할 수 있습니다.
 
 Pages publishing source는 **GitHub Actions**입니다. `.github/workflows/pages.yml`이 테스트 → 공개 빌드 → 정적 검사 → 배포를 수행합니다. PR에서는 빌드/검사만 수행합니다. 기존 Docs 저장소나 Console 배포는 변경하지 않습니다.
 
