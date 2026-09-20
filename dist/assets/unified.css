@@ -25,6 +25,10 @@ a,button,input{outline-offset:5px}
 .hero h1{font-size:clamp(2.4rem,4vw,3.65rem);line-height:1.1;letter-spacing:-.05em}
 .hero .lead{font-size:1rem;line-height:1.75;max-width:620px;margin:26px 0 28px;color:#e4ecf6}
 .hero .eyebrow{font-size:.7rem;letter-spacing:.15em;margin-bottom:24px}
+.hero-architecture{margin:0;min-width:0}
+.hero-architecture>a{display:block;cursor:zoom-in}
+.hero-architecture img{display:block;width:100%;height:auto;object-fit:contain}
+.hero-architecture .hero-diagram-hint{display:block;margin-top:8px;text-align:right;font-size:11px;color:var(--cyan)}
 .lifecycle-diagram{border-radius:12px;box-shadow:none;padding:25px;border-color:#7388ab}
 .lifecycle-node{border-radius:4px}
 .lifecycle-heading{font-size:.68rem;gap:8px}
