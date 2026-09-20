@@ -20,19 +20,38 @@ tabs.forEach((tab,index)=>{
   tab.addEventListener('click',()=>activate(tab));
   tab.addEventListener('keydown',e=>{let target=index;if(['ArrowRight','ArrowDown'].includes(e.key))target=(index+1)%tabs.length;else if(['ArrowLeft','ArrowUp'].includes(e.key))target=(index-1+tabs.length)%tabs.length;else if(e.key==='Home')target=0;else if(e.key==='End')target=tabs.length-1;else return;e.preventDefault();activate(tabs[target],true);});
 });
-const evidenceTabs=[...document.querySelectorAll('.evidence-tab')];
-function activateEvidence(tab,focus=false){
-  evidenceTabs.forEach(t=>{const chosen=t===tab;t.setAttribute('aria-selected',String(chosen));t.tabIndex=chosen?0:-1;});
-  const image=document.getElementById('evidenceImage');
-  image.src=tab.dataset.image;
-  image.alt=tab.dataset.title+' — captured from Flower public pages';
-  document.getElementById('evidenceTitle').textContent=tab.dataset.title;
-  document.getElementById('evidenceCopy').textContent=tab.dataset.copy;
-  document.getElementById('evidenceLink').href=tab.dataset.link;
-  document.getElementById('evidencePanel').setAttribute('aria-labelledby',tab.id);
-  if(focus)tab.focus();
-}
-evidenceTabs.forEach((tab,index)=>{
-  tab.addEventListener('click',()=>activateEvidence(tab));
-  tab.addEventListener('keydown',e=>{let target=index;if(['ArrowRight','ArrowDown'].includes(e.key))target=(index+1)%evidenceTabs.length;else if(['ArrowLeft','ArrowUp'].includes(e.key))target=(index-1+evidenceTabs.length)%evidenceTabs.length;else if(e.key==='Home')target=0;else if(e.key==='End')target=evidenceTabs.length-1;else return;e.preventDefault();activateEvidence(evidenceTabs[target],true);});
+document.querySelectorAll('.contribution-card').forEach(card=>{
+  const contributionTabs=[...card.querySelectorAll('.contribution-tabs [role="tab"]')];
+  const panel=card.querySelector('.contribution-preview');
+  if(!panel||!contributionTabs.length)return;
+  function activateContribution(tab,focus=false){
+    contributionTabs.forEach(t=>{const chosen=t===tab;t.setAttribute('aria-selected',String(chosen));t.tabIndex=chosen?0:-1;});
+    const image=panel.querySelector('.contribution-image');
+    image.src=tab.dataset.image;
+    image.alt=tab.dataset.title+' — captured from Flower public pages';
+    panel.querySelector('.contribution-title').textContent=tab.dataset.title;
+    panel.querySelector('.contribution-source').href=tab.dataset.link;
+    panel.setAttribute('aria-labelledby',tab.id);
+    if(focus)tab.focus();
+  }
+  contributionTabs.forEach((tab,index)=>{
+    tab.addEventListener('click',()=>activateContribution(tab));
+    tab.addEventListener('keydown',e=>{let target=index;if(['ArrowRight','ArrowDown'].includes(e.key))target=(index+1)%contributionTabs.length;else if(['ArrowLeft','ArrowUp'].includes(e.key))target=(index-1+contributionTabs.length)%contributionTabs.length;else if(e.key==='Home')target=0;else if(e.key==='End')target=contributionTabs.length-1;else return;e.preventDefault();activateContribution(contributionTabs[target],true);});
+  });
 });
+const contributionSwitcher=document.querySelector('.contribution-switcher');
+if(contributionSwitcher){
+  const buttons=[...contributionSwitcher.querySelectorAll('button')];
+  const mobile=window.matchMedia('(max-width:700px)');
+  let active=buttons[0].getAttribute('aria-controls');
+  function showContributions(){
+    buttons.forEach(button=>{
+      const chosen=button.getAttribute('aria-controls')===active;
+      button.setAttribute('aria-pressed',String(chosen));
+      document.getElementById(button.getAttribute('aria-controls')).hidden=mobile.matches&&!chosen;
+    });
+  }
+  buttons.forEach(button=>button.addEventListener('click',()=>{active=button.getAttribute('aria-controls');showContributions();}));
+  mobile.addEventListener('change',showContributions);
+  showContributions();
+}
