@@ -1,15 +1,14 @@
 from pathlib import Path
 from html import escape
 import json
+import shutil
+from site_config import ROOT, DIST, DOCS, CONSOLE, REGISTRY, with_base_path
 from unified import site_document, build_knowledge_pages, build_doc_redirects, load_posts, post_row
 
-ROOT=Path(__file__).resolve().parent
-DIST=ROOT/'dist'
-FEDOPS='http://127.0.0.1:4314/fedops/task'
-CONSOLE=FEDOPS
-REGISTRY='http://127.0.0.1:4314/fedops/registry'
+DIST.mkdir(parents=True, exist_ok=True)
+if DIST != ROOT/'dist':
+    shutil.copytree(ROOT/'dist/assets', DIST/'assets', dirs_exist_ok=True)
 GITHUB='https://github.com/gachon-CCLab/FedOps'
-DOCS='https://gachon-cclab.github.io/fedops-docs-1.3/'
 # Resolve documentation links in shared navigation and authored page fragments.
 DOC_LINKS={
     '/document/': DOCS,
@@ -42,7 +41,7 @@ def page(path,title,description,body,section=''):
         content=content.replace(f'href="{local_url}"', f'href="{docs_url}"')
     out=DIST/path
     out.parent.mkdir(parents=True,exist_ok=True)
-    out.write_text(content,encoding='utf-8')
+    out.write_text(with_base_path(content),encoding='utf-8')
 
 def head(kicker,title,description):
     return f'<section class="page-head"><div class="wrap"><p class="eyebrow">{kicker}</p><h1>{title}</h1><p>{description}</p></div></section>'
@@ -57,7 +56,7 @@ architecture=[
 ('04 / FIND & REUSE','Registry','Discover published Tasks and follow model versions back to their source.',REGISTRY,'Open Registry'),
 ]
 def arch_link(url,label):
-    if url.startswith('https'): return external(url,label)
+    if url.startswith(('https://', 'http://')): return external(url,label)
     return '<a class="text-link" href="'+url+'">'+label+' <span aria-hidden="true">→</span></a>'
 arch=''.join(f'<article class="architecture-card"><span class="number">{n}</span><h3>{name}</h3><p>{desc}</p>{arch_link(url,label)}</article>' for n,name,desc,url,label in architecture)
 steps=[('Create & Register','Prepare a local model and publish a Federated Task with an Initiative Model.'),('Load & Join','Request access to a Task and prepare your approved release locally.'),('Federated Learning','Train on local data and send model updates for aggregation.'),('Global Model','Track the results of each Campaign as a new model version.'),('Build & Serve','Pin model versions in an Agent Build, then use local chat or an API.'),('Improve','Retrain a selected model, validate it, and build a new Agent revision.')]

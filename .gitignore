@@ -13,3 +13,4 @@ work/**
 !work/flower-profile.json
 !work/validate.py
 docs-preview-notes.md
+_site/

@@ -9,7 +9,7 @@ a,button,input{outline-offset:5px}
 .nav{height:76px;background:rgba(255,255,255,.98);border-bottom:1px solid var(--line);color:var(--ink);backdrop-filter:blur(14px);z-index:50}
 .nav-inner{height:76px;gap:12px}
 .brand{color:var(--ink);font-size:23px;letter-spacing:-.6px;gap:10px;white-space:nowrap}
-.brandmark{width:36px;height:36px;min-width:36px;background-image:url('/assets/fedops-icon.png');background-size:145%;background-position:center;background-repeat:no-repeat}
+.brandmark{width:36px;height:36px;min-width:36px;background-image:url('fedops_icon.png');background-size:contain;background-position:center;background-repeat:no-repeat}
 .nav .badge{color:var(--blue);border:1px solid var(--line);border-radius:20px;font-size:11px;font-weight:700;line-height:1;padding:5px 8px;background:var(--soft);margin-left:0}
 .nav-links{gap:28px;margin-left:auto;margin-right:20px;height:100%;align-items:center}
 .nav-links>a{font-size:13px;color:var(--muted);position:relative;display:flex;align-items:center;height:100%;font-weight:600}

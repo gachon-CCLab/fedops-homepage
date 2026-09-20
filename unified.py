@@ -6,10 +6,8 @@ No third-party packages or database are needed to build these pages.
 from html import escape
 from pathlib import Path
 import re
+from site_config import CONSOLE, REGISTRY, DOCS, DIST
 
-CONSOLE = 'http://127.0.0.1:4314/fedops/task'
-REGISTRY = 'http://127.0.0.1:4314/fedops/registry'
-DOCS = 'https://gachon-cclab.github.io/fedops-docs-1.3/'
 GITHUB = 'https://github.com/gachon-CCLab/FedOps'
 
 
@@ -24,7 +22,7 @@ def site_document(title, description, body, section):
     return f'''<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>{escape(title)} | FedOps</title><meta name="description" content="{escape(description, quote=True)}"><meta name="theme-color" content="#314B82">
-<link rel="icon" href="/assets/fedops-icon.png" type="image/png"><link rel="stylesheet" href="/assets/site.css?v=20260920"><link rel="stylesheet" href="/assets/unified.css?v=20260920">
+<link rel="icon" href="/assets/fedops_icon.png" type="image/png"><link rel="apple-touch-icon" href="/assets/fedops_icon.png"><link rel="stylesheet" href="/assets/site.css?v=20260920b"><link rel="stylesheet" href="/assets/unified.css?v=20260920b">
 <script src="/assets/site.js?v=20260920" defer></script><script src="/assets/unified.js?v=20260920" defer></script></head>
 <body class="unified-site {section}-page"><a class="skip" href="#main">Skip to content</a>
 <header class="nav"><div class="wrap nav-inner">{brand()}<span class="badge">1.3</span><nav id="primary-navigation" class="nav-links" aria-label="Primary navigation">{nav}</nav>
@@ -36,29 +34,68 @@ def site_document(title, description, body, section):
 
 def inline(text):
     """Render a deliberately small, escaped Markdown subset for authored posts."""
-    text = escape(text)
-    def link(match):
-        label, href = match.group(1), match.group(2)
-        if not (href.startswith(('/', 'https://', 'http://127.0.0.1:'))):
-            return label
-        return f'<a href="{href}">{label}</a>'
-    text = re.sub(r'\[([^\]]+)\]\(([^\s)]+)\)',link,text)
-    text = re.sub(r'\*\*(.+?)\*\*',r'<strong>\1</strong>',text)
-    text = re.sub(r'`([^`]+)`',r'<code>\1</code>',text)
-    return text
+    tokens = re.compile(
+        r'(?P<fence>`+)(?P<code>.+?)(?P=fence)'
+        r'|\[(?P<label>[^\]]+)\]\((?P<href>[^\s)]+)\)'
+        r'|\*\*(?P<strong>.+?)\*\*'
+    )
+    rendered, position = [], 0
+    for match in tokens.finditer(text):
+        rendered.append(escape(text[position:match.start()]))
+        if match.group('code') is not None:
+            # Code is escaped once and never interpreted as links or emphasis.
+            rendered.append('<code>'+escape(match.group('code'))+'</code>')
+        elif match.group('href') is not None:
+            href = match.group('href')
+            label = inline(match.group('label'))
+            local_path = href.startswith('/') and not href.startswith('//')
+            if local_path or href.startswith(('https://', 'http://127.0.0.1:')):
+                rendered.append(f'<a href="{escape(href, quote=True)}">{label}</a>')
+            else:
+                rendered.append(label)
+        else:
+            rendered.append('<strong>'+inline(match.group('strong'))+'</strong>')
+        position = match.end()
+    rendered.append(escape(text[position:]))
+    return ''.join(rendered)
 
 
 def markdown(text):
     blocks, paragraph, items = [], [], []
+    list_type, list_start = None, 1
+    fence, language, code_lines = None, '', []
     def flush():
+        nonlocal list_type, list_start
         if paragraph:
             blocks.append('<p>'+inline(' '.join(paragraph))+'</p>')
             paragraph.clear()
         if items:
-            blocks.append('<ul>'+''.join('<li>'+inline(item)+'</li>' for item in items)+'</ul>')
+            start = f' start="{list_start}"' if list_type == 'ol' and list_start != 1 else ''
+            blocks.append(f'<{list_type}{start}>'+''.join('<li>'+inline(item)+'</li>' for item in items)+f'</{list_type}>')
             items.clear()
+        list_type, list_start = None, 1
+    def emit_code():
+        class_name = f' class="language-{language}"' if language else ''
+        code = '\n'.join(code_lines)+('\n' if code_lines else '')
+        blocks.append(f'<pre><code{class_name}>'+escape(code)+'</code></pre>')
+        code_lines.clear()
     for line in text.splitlines():
-        if not line.strip():
+        if fence is not None:
+            closing = r' {0,3}'+re.escape(fence[0])+'{'+str(len(fence))+r',}\s*'
+            if re.fullmatch(closing, line):
+                emit_code()
+                fence = None
+            else:
+                code_lines.append(line)
+            continue
+        opening = re.fullmatch(r' {0,3}(`{3,}|~{3,})[ \t]*(.*)', line)
+        ordered = re.fullmatch(r'(\d+)[.)]\s+(.+)', line)
+        if opening:
+            flush()
+            fence = opening[1]
+            info = opening[2].strip().split()
+            language = info[0] if info and re.fullmatch(r'[A-Za-z0-9_+.-]+',info[0]) else ''
+        elif not line.strip():
             flush()
         elif re.fullmatch(r'!\[([^\]]*)\]\((/assets/[^\s)]+)\)', line):
             flush()
@@ -68,18 +105,25 @@ def markdown(text):
             flush()
             level = len(line.split(' ')[0])
             blocks.append(f'<h{level}>'+inline(line[level+1:])+f'</h{level}>')
-        elif line.startswith('- '):
-            if paragraph: flush()
-            items.append(line[2:])
+        elif line.startswith('- ') or ordered:
+            current_type = 'ol' if ordered else 'ul'
+            if paragraph or (items and list_type != current_type):
+                flush()
+            if not items:
+                list_type = current_type
+                list_start = int(ordered[1]) if ordered else 1
+            items.append(ordered[2] if ordered else line[2:])
         else:
             if items: flush()
             paragraph.append(line.strip())
+    if fence is not None:
+        emit_code()
     flush()
     return ''.join(blocks)
 
 
 def load_posts(root, section):
-    posts = []
+    posts, slugs = [], {}
     for source in sorted((root/'content'/section).glob('*.md')):
         raw = source.read_text(encoding='utf-8-sig')
         parts = raw.split('---',2)
@@ -93,6 +137,11 @@ def load_posts(root, section):
             if not meta.get(field): raise ValueError(f'{source}: missing {field}')
         if not re.fullmatch('[a-z0-9-]+',meta['slug']):
             raise ValueError(f'Invalid slug: {source}')
+        if meta['status'] not in ('draft', 'published'):
+            raise ValueError(f'{source}: invalid status {meta["status"]!r}; use draft or published')
+        if meta['slug'] in slugs:
+            raise ValueError(f'Duplicate slug {meta["slug"]!r}: {slugs[meta["slug"]]} and {source}')
+        slugs[meta['slug']] = source
         if meta['status'] != 'published' or meta.get('sample', '').lower() == 'true':
             continue
         meta['html'] = markdown(parts[2])
@@ -114,14 +163,14 @@ def build_collection(root, page, section):
         rows = f'<div class="empty"><p class="eyebrow">{section.capitalize()}</p><h2>No {"articles" if section == "blog" else "updates"} published yet.</h2><p>In the meantime, explore the documentation and the research behind FedOps.</p><div class="actions" style="justify-content:center"><a class="button blue" href="{DOCS}">Read the documentation →</a><a class="button outline" href="{DOCS}v1.3/resources/">Explore research &amp; resources →</a></div></div>'
     body = f'<section class="page-head"><div class="wrap"><p class="eyebrow">{section.capitalize()}</p><h1>{title}</h1><p>{summary}</p></div></section><section class="section"><div class="wrap">{rows}</div></section>'
     page(Path(f'{section}/index.html'),section.capitalize(),summary,body,section)
-    published_paths = {(root/'dist'/section/'index.html').resolve()}
+    published_paths = {(DIST/section/'index.html').resolve()}
     for post in posts:
         body = f'<div class="wrap"><article class="prose article-standalone"><a class="back" href="/{section}/">← All {section}</a><br><span class="status-label">{escape(post["category"])}</span><h1>{escape(post["title"])}</h1><p>{escape(post["summary"])}</p>{post["html"]}<div class="article-bottom"><a href="/{section}/">← All {section}</a><a href="{DOCS}">FedOps 1.3 Docs →</a></div></article></div>'
         output = Path(f'{section}/{post["slug"]}/index.html')
         page(output,post['title'],post['summary'],body,section)
-        published_paths.add((root/'dist'/output).resolve())
+        published_paths.add((DIST/output).resolve())
     # These HTML files are generated outputs. Keep draft source Markdown intact.
-    generated_root = (root/'dist'/section).resolve()
+    generated_root = (DIST/section).resolve()
     for old_page in generated_root.rglob('*.html'):
         resolved = old_page.resolve()
         assert resolved.is_relative_to(generated_root)
@@ -133,7 +182,7 @@ def build_doc_redirects(root, links):
     for old_url, destination in links.items():
         if '#' in old_url:
             continue
-        output = root/'dist'/old_url.strip('/')/'index.html'
+        output = DIST/old_url.strip('/')/'index.html'
         output.parent.mkdir(parents=True,exist_ok=True)
         target = escape(destination,quote=True)
         output.write_text(f'<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>FedOps Docs</title><link rel="canonical" href="{target}"><meta http-equiv="refresh" content="0;url={target}"></head><body><main><p>Opening <a href="{target}">FedOps 1.3 Docs</a>.</p></main></body></html>',encoding='utf-8')
