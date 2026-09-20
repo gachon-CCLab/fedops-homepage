@@ -1,0 +1,7 @@
+{
+  "path": "document/campaign/index.html",
+  "title": "Campaign & Server Management.",
+  "description": "Operate shared training for a published Task and track the model version produced by each Campaign.",
+  "section": "document",
+  "body": "doc-campaign.html"
+}

@@ -1,0 +1,15 @@
+__pycache__/
+*.pyc
+*.log
+.env
+.env.*
+.openai/
+# Generated pages. Keep original local image/CSS/JS assets under version control.
+dist/**/*.html
+dist/*.html
+# One-time extraction tools, capture caches, and old drafts are not site sources.
+work/**
+!work/screens.json
+!work/flower-profile.json
+!work/validate.py
+docs-preview-notes.md

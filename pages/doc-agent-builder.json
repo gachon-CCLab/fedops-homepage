@@ -1,0 +1,7 @@
+{
+  "path": "document/agent-builder/index.html",
+  "title": "Build and serve an Agent.",
+  "description": "Compose an Agent using a Base LLM, Tool AI models, and a defined execution policy.",
+  "section": "document",
+  "body": "doc-agent-builder.html"
+}

@@ -1,0 +1,7 @@
+{
+  "path": "document/getting-started/index.html",
+  "title": "Getting Started.",
+  "description": "Prepare your local environment, then choose whether to create a Task, join training, or build an Agent.",
+  "section": "document",
+  "body": "doc-getting-started.html"
+}

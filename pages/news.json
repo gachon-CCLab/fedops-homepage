@@ -1,0 +1,7 @@
+{
+  "path": "news/index.html",
+  "title": "News",
+  "description": "Release information and development updates from FedOps.",
+  "section": "news",
+  "body": "news.html"
+}

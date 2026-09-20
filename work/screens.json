@@ -1,0 +1,32 @@
+[
+  {
+    "image": "studio-01.png",
+    "title": "Agent Studio Home",
+    "description": "Start a Federated Task, join an approved Task, or build an AI Agent from the same local workspace."
+  },
+  {
+    "image": "studio-02.png",
+    "title": "Workspace & Project Setup",
+    "description": "Review the repository, Python environment, dependencies, local data configuration, and readiness before execution."
+  },
+  {
+    "image": "studio-03.png",
+    "title": "Global Model Versions",
+    "description": "Review Initiative and Global Model versions with their source Federated Task, evaluation, files, and lineage."
+  },
+  {
+    "image": "studio-04.png",
+    "title": "Agent Builder",
+    "description": "Select a reasoning model and Tool AI models from the Registry, then pin the exact versions used by the Agent Build."
+  },
+  {
+    "image": "studio-05.png",
+    "title": "Serving API",
+    "description": "Launch an Agent Build for local use or expose it through the Serving API with controlled runtime settings."
+  },
+  {
+    "image": "studio-06.png",
+    "title": "Participation & Training History",
+    "description": "Confirm readiness, follow federated training, and review round results and participation history."
+  }
+]

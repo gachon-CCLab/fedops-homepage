@@ -1,0 +1,7 @@
+{
+  "path": "blog/index.html",
+  "title": "Blog",
+  "description": "Technical articles, federated learning research, and practical examples.",
+  "section": "blog",
+  "body": "blog.html"
+}
