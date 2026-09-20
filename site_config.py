@@ -12,8 +12,11 @@ if BASE_PATH and not re.fullmatch(r'/[A-Za-z0-9_-]+(?:/[A-Za-z0-9_-]+)*', BASE_P
     raise ValueError('FEDOPS_BASE_PATH must be an absolute path without a trailing slash or traversal.')
 DIST = Path(os.environ.get('FEDOPS_OUTPUT_DIR', str(ROOT / 'dist'))).resolve()
 DOCS = 'https://gachon-cclab.github.io/fedops-docs-1.3/'
-CONSOLE = os.environ.get('FEDOPS_CONSOLE_URL', 'https://ccl.gachon.ac.kr/fedops' if PUBLIC else 'http://127.0.0.1:4314/fedops/task')
-REGISTRY = os.environ.get('FEDOPS_REGISTRY_URL', 'https://ccl.gachon.ac.kr/fedops/registry' if PUBLIC else 'http://127.0.0.1:4314/fedops/registry')
+HOME = 'https://gachon-cclab.github.io/fedops-homepage/'
+BLOG = HOME + 'blog/'
+NEWS = HOME + 'news/'
+CONSOLE = os.environ.get('FEDOPS_CONSOLE_URL', 'https://ccl.gachon.ac.kr/fedops')
+REGISTRY = os.environ.get('FEDOPS_REGISTRY_URL', 'https://ccl.gachon.ac.kr/fedops/registry')
 for setting in (CONSOLE, REGISTRY):
     parsed = urlsplit(setting)
     if parsed.scheme not in ('http', 'https') or not parsed.hostname or parsed.username or parsed.password:

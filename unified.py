@@ -6,18 +6,18 @@ No third-party packages or database are needed to build these pages.
 from html import escape
 from pathlib import Path
 import re
-from site_config import CONSOLE, REGISTRY, DOCS, DIST
+from site_config import CONSOLE, REGISTRY, DOCS, HOME, BLOG, NEWS, DIST
 
 GITHUB = 'https://github.com/gachon-CCLab/FedOps'
 
 
 def brand():
-    return '<a class="brand" href="/version-2/" aria-label="FedOps home"><span class="brandmark" aria-hidden="true"></span>FedOps</a>'
+    return f'<a class="brand" href="{HOME}" aria-label="FedOps home"><span class="brandmark" aria-hidden="true"></span>FedOps</a>'
 
 
 def site_document(title, description, body, section):
-    items = [('home', '/version-2/', 'Home'),
-             ('document', DOCS, 'Docs'), ('blog', '/blog/', 'Blog'), ('news', '/news/', 'News')]
+    items = [('home', HOME, 'Home'),
+             ('document', DOCS, 'Docs'), ('blog', BLOG, 'Blog'), ('news', NEWS, 'News')]
     nav = ''.join(f'<a href="{url}"'+(' aria-current="page"' if section == key else '')+f'>{label}</a>' for key, url, label in items)
     return f'''<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
@@ -28,7 +28,7 @@ def site_document(title, description, body, section):
 <header class="nav"><div class="wrap nav-inner">{brand()}<span class="badge">1.3</span><nav id="primary-navigation" class="nav-links" aria-label="Primary navigation">{nav}</nav>
 <button class="menu-toggle" aria-controls="primary-navigation" aria-expanded="false">Menu</button><div class="nav-actions"><a href="{CONSOLE}" target="_blank" rel="noopener noreferrer" class="button console unified-primary">Open Console <span aria-hidden="true">↗</span><span class="sr-only"> (opens in a new tab)</span></a></div></div></header>
 <main id="main">{body}</main>
-<footer class="footer"><div class="wrap"><div class="footer-top"><div>{brand()}<p>Gachon University · Cognitive Computing Lab<br>Local intelligence. Shared progress.</p></div><div class="footer-groups"><nav aria-label="Platform links"><b>Platform</b><a href="/version-2/">Home</a><a href="{CONSOLE}" target="_blank" rel="noopener noreferrer">Open Console ↗</a></nav><nav aria-label="Knowledge links"><b>Learn &amp; follow</b><a href="{DOCS}">Docs</a><a href="/blog/">Blog</a><a href="/news/">News</a></nav><nav aria-label="Community links"><b>Community</b><a href="{GITHUB}" target="_blank" rel="noopener noreferrer">GitHub ↗</a><a href="https://flower.ai/profile/gfedops/apps" target="_blank" rel="noopener noreferrer">Flower Hub ↗</a><a href="https://sites.google.com/view/keylee" target="_blank" rel="noopener noreferrer">Gachon CCL ↗</a></nav></div></div>
+<footer class="footer"><div class="wrap"><div class="footer-top"><div>{brand()}<p>Gachon University · Cognitive Computing Lab<br>Local intelligence. Shared progress.</p></div><div class="footer-groups"><nav aria-label="Platform links"><b>Platform</b><a href="{HOME}">Home</a><a href="{CONSOLE}" target="_blank" rel="noopener noreferrer">Open Console ↗</a></nav><nav aria-label="Knowledge links"><b>Learn &amp; follow</b><a href="{DOCS}">Docs</a><a href="{BLOG}">Blog</a><a href="{NEWS}">News</a></nav><nav aria-label="Community links"><b>Community</b><a href="{GITHUB}" target="_blank" rel="noopener noreferrer">GitHub ↗</a><a href="https://flower.ai/profile/gfedops/apps" target="_blank" rel="noopener noreferrer">Flower Hub ↗</a><a href="https://sites.google.com/view/keylee" target="_blank" rel="noopener noreferrer">Gachon CCL ↗</a></nav></div></div>
 <div class="footer-bottom"><span>© 2026 Cognitive Computing Lab, Gachon University</span><span>FedOps 1.3 · Design preview</span></div></div></footer></body></html>'''
 
 
@@ -150,11 +150,13 @@ def load_posts(root, section):
 
 
 def post_row(post, section):
-    return f'<a class="news-row" href="/{section}/{post["slug"]}/"><span class="category">{escape(post["category"]).upper()}</span><div><h3>{escape(post["title"])}</h3><p>{escape(post["summary"])}</p></div><span class="text-link read">Read {"article" if section == "blog" else "update"} <span aria-hidden="true">→</span></span></a>'
+    collection = BLOG if section == 'blog' else NEWS
+    return f'<a class="news-row" href="{collection}{post["slug"]}/"><span class="category">{escape(post["category"]).upper()}</span><div><h3>{escape(post["title"])}</h3><p>{escape(post["summary"])}</p></div><span class="text-link read">Read {"article" if section == "blog" else "update"} <span aria-hidden="true">→</span></span></a>'
 
 
 def build_collection(root, page, section):
     posts = load_posts(root, section)
+    collection = BLOG if section == 'blog' else NEWS
     title = 'Ideas behind the work.' if section == 'blog' else 'The next chapter.'
     summary = ('Technical perspectives, research, and practical examples from the FedOps community.'
                if section == 'blog' else 'Release information, documentation updates, and development progress from FedOps.')
@@ -165,7 +167,7 @@ def build_collection(root, page, section):
     page(Path(f'{section}/index.html'),section.capitalize(),summary,body,section)
     published_paths = {(DIST/section/'index.html').resolve()}
     for post in posts:
-        body = f'<div class="wrap"><article class="prose article-standalone"><a class="back" href="/{section}/">← All {section}</a><br><span class="status-label">{escape(post["category"])}</span><h1>{escape(post["title"])}</h1><p>{escape(post["summary"])}</p>{post["html"]}<div class="article-bottom"><a href="/{section}/">← All {section}</a><a href="{DOCS}">FedOps 1.3 Docs →</a></div></article></div>'
+        body = f'<div class="wrap"><article class="prose article-standalone"><a class="back" href="{collection}">← All {section}</a><br><span class="status-label">{escape(post["category"])}</span><h1>{escape(post["title"])}</h1><p>{escape(post["summary"])}</p>{post["html"]}<div class="article-bottom"><a href="{collection}">← All {section}</a><a href="{DOCS}">FedOps 1.3 Docs →</a></div></article></div>'
         output = Path(f'{section}/{post["slug"]}/index.html')
         page(output,post['title'],post['summary'],body,section)
         published_paths.add((DIST/output).resolve())

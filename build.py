@@ -2,7 +2,7 @@ from pathlib import Path
 from html import escape
 import json
 import shutil
-from site_config import ROOT, DIST, DOCS, CONSOLE, REGISTRY, with_base_path
+from site_config import ROOT, DIST, DOCS, HOME, NEWS, CONSOLE, REGISTRY, with_base_path
 from unified import site_document, build_knowledge_pages, build_doc_redirects, load_posts, post_row
 
 DIST.mkdir(parents=True, exist_ok=True)
@@ -33,7 +33,7 @@ MANUALS=[
 def external(url,label,cls='text-link'):
     return f'<a class="{cls}" href="{escape(url,quote=True)}" target="_blank" rel="noopener noreferrer">{label}<span aria-hidden="true">↗</span><span class="sr-only"> (opens in a new tab)</span></a>'
 def brand():
-    return '<a class="brand" href="/version-2/"><span class="brandmark" aria-hidden="true"></span>FedOps</a>'
+    return f'<a class="brand" href="{HOME}"><span class="brandmark" aria-hidden="true"></span>FedOps</a>'
 def page(path,title,description,body,section=''):
     # Docs stay in the separately maintained GitHub Pages documentation.
     content=site_document(title,description,body,section or 'home')
@@ -105,7 +105,7 @@ home=f'''
 <section class="section" id="lifecycle"><div class="wrap"><div class="intro"><div><p class="eyebrow">The lifecycle</p><h2>Train together.<br><span>Build on the result.</span></h2></div><p>Federated learning creates a model you can use again. Agent Builds keep the selected versions fixed while new models are trained and evaluated.</p></div><div class="steps">{step_html}</div><div class="model-note"><strong>A new model. A deliberate update.</strong><p>A new Global Model does not silently replace a running Agent. Select the new version, validate it, and build a new revision.</p></div></div></section>
 {ecosystem_section}
 <section class="section start-section" id="start"><div class="wrap"><p class="eyebrow">Choose your starting point</p><h2 class="section-title">Your next step with FedOps.</h2><div class="start-grid"><article class="start-card"><span class="number">FOR TASK OWNERS</span><h3>Bring a model.<br>Start a shared Task.</h3><p>Prepare your local project, create an Initiative Model, and publish a Task for others to join.</p><a class="text-link" href="/document/task-owner/">Create a Federated Task <span aria-hidden="true">→</span></a></article><article class="start-card"><span class="number">FOR PARTICIPANTS</span><h3>Find a Task.<br>Contribute locally.</h3><p>Request access to a published Task and train with your own data from Agent Studio.</p><a class="text-link" href="/document/participant/">Join federated learning <span aria-hidden="true">→</span></a></article></div></div></section>
-<section class="section" id="news"><div class="wrap"><div class="news-header"><div><p class="eyebrow">News & updates</p><h2 class="section-title">What’s next for FedOps.</h2></div><a class="text-link" href="/news/">All news <span aria-hidden="true">→</span></a></div>{news_row}</div></section>
+<section class="section" id="news"><div class="wrap"><div class="news-header"><div><p class="eyebrow">News & updates</p><h2 class="section-title">What’s next for FedOps.</h2></div><a class="text-link" href="{NEWS}">All news <span aria-hidden="true">→</span></a></div>{news_row}</div></section>
 <section class="cta community" id="joincommunity"><div class="wrap"><h2>Join our Community!</h2><p>Join us on our journey to make federated approaches available to everyone.</p><div class="actions">{external("https://join.slack.com/t/fedopshq/shared_invite/zt-3h73abys7-ms07FlAVG7EP2108BzevcA", "Join our Slack", "button primary")}<a class="button secondary" href="/document/getting-started/">Read the Getting Started guide <span aria-hidden="true">→</span></a></div></div></section>
 '''
 page(Path('index.html'),'FedOps 1.3 — Federated AI AgentOps','Local model development, federated learning, and AI Agent delivery in one connected lifecycle.',home)
