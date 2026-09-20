@@ -22,7 +22,7 @@ def site_document(title, description, body, section):
     return f'''<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>{escape(title)} | FedOps</title><meta name="description" content="{escape(description, quote=True)}"><meta name="theme-color" content="#314B82">
-<link rel="icon" href="/assets/fedops_icon.png" type="image/png"><link rel="apple-touch-icon" href="/assets/fedops_icon.png"><link rel="stylesheet" href="/assets/site.css?v=20260920b"><link rel="stylesheet" href="/assets/unified.css?v=20260920b">
+<link rel="icon" href="/assets/fedops_icon.png" type="image/png"><link rel="apple-touch-icon" href="/assets/fedops_icon.png"><link rel="stylesheet" href="/assets/site.css?v=20260920b"><link rel="stylesheet" href="/assets/unified.css?v=20260920c">
 <script src="/assets/site.js?v=20260920" defer></script><script src="/assets/unified.js?v=20260920" defer></script></head>
 <body class="unified-site {section}-page"><a class="skip" href="#main">Skip to content</a>
 <header class="nav"><div class="wrap nav-inner">{brand()}<span class="badge">1.3</span><nav id="primary-navigation" class="nav-links" aria-label="Primary navigation">{nav}</nav>

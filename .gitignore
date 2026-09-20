@@ -11,6 +11,7 @@ dist/*.html
 work/**
 !work/screens.json
 !work/flower-profile.json
+!work/hero-diagram.html
 !work/validate.py
 docs-preview-notes.md
 _site/
